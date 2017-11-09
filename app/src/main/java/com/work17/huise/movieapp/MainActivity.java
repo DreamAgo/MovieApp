@@ -1,16 +1,44 @@
 package com.work17.huise.movieapp;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
 
+import com.alibaba.fastjson.JSON;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.ProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
     private ViewPager viewPager;
@@ -21,6 +49,8 @@ public class MainActivity extends AppCompatActivity {
     private ImageView imageView;
      //定义一个ImageVIew数组，来存放生成的小园点
      private ImageView[] imageViews;
+    private ListViewForScrollView listView;
+    private  String path="https://api.douban.com/v2/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,8 +60,124 @@ public class MainActivity extends AppCompatActivity {
         initPageAdapter();
         initPointer();
         initEvent();
+        initList();
 
     }
+
+    private void initList() {
+
+      final   Handler handler=new Handler()
+        {
+            @Override
+            public void handleMessage(Message msg) {
+                // TODO Auto-generated method stub
+                Bundle bu=msg.getData();
+               String js= bu.getString("data");//获取数据
+               getdata(js);//解析数据
+
+            }
+
+        };
+        listView=(ListViewForScrollView)findViewById(R.id.list);
+        Runnable r=new Runnable() {
+            @Override
+            public void run() {
+                String js = loginByGet();
+                Message message=new Message();
+                Bundle bundle=new Bundle();
+                bundle.putString("data",js);
+                message.setData(bundle);
+                handler.sendMessage(message);//发送数据
+              //  SimpleAdapter sim=new SimpleAdapter();
+            }
+        };
+        new Thread(r).start();
+       // List<MoveData>move= JSON.parseArray()
+
+
+
+    }
+    private void getdata(String js)
+    {
+        MoveData movie = JSON.parseObject(js, MoveData.class);
+        List<SubjectsBean> subs = movie.getSubjects();
+        List<HashMap<String, Object>> maps = new ArrayList<HashMap<String, Object>>();
+        for (SubjectsBean s : subs) {
+
+            final HashMap<String, Object> map = new HashMap<String, Object>();
+            map.put("title","电影名："+s.getTitle());//电影名
+
+            map.put("year","年份："+s.getYear());//电影年份
+
+            String imgUrl = s.getImages().getLarge();
+
+            //for test
+            AsyncImageLoader loader = new AsyncImageLoader(getApplicationContext());
+
+            //将图片缓存至外部文件中
+            loader.setCache2File(true); //false
+            //设置外部缓存文件夹
+            loader.setCachedDir(this.getCacheDir().getAbsolutePath());
+            Log.d("445","1");
+            //下载图片，第二个参数是否缓存至内存中
+            loader.downloadImage(imgUrl, true/*false*/, new AsyncImageLoader.ImageCallback() {
+                @Override
+                public void onImageLoaded(Bitmap bitmap, String imageUrl) {
+                    if(bitmap != null){
+                        Log.d("445","2");
+                        map.put("image",bitmap);
+                    }else{
+                        //下载失败，设置默认图片
+                    }
+                }
+            });
+            Log.d("445","3");
+            map.put("directors","导演："+s.getDirectors().get(0).getName());//电影导演
+            String ca="";
+
+            for(CastsBean c:s.getCasts())//电影主演
+            {
+                ca+=c.getName()+"/";
+            }
+            map.put("Casts","主演："+ca);
+            maps.add(map);
+        }
+        SimpleAdapter sim=new SimpleAdapter(this,maps,R.layout.list_view,new String[]{"title","year","image","directors","Casts"},new int[]{R.id.title, R.id.year, R.id.image,R.id.directors,R.id.casts});
+        listView.setAdapter(sim);
+    }
+    public static String loginByGet(){
+        //get的方式提交就是url拼接的方式
+        String path = "https://api.douban.com/v2/movie/in_theaters";
+        try {
+            URL url = new URL(path);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setConnectTimeout(5000);
+            connection.setRequestMethod("GET");
+            //获得结果码
+            int responseCode = connection.getResponseCode();
+            if(responseCode ==200){
+                //请求成功 获得返回的流
+                InputStream is = connection.getInputStream();
+                BufferedReader bf=new BufferedReader(new InputStreamReader(is,"UTF-8"));
+                //最好在将字节流转换为字符流的时候 进行转码
+                StringBuffer buffer=new StringBuffer();
+                String line="";
+                while((line=bf.readLine())!=null){
+                    buffer.append(line);
+                }
+
+                return buffer.toString();
+                // return IOSUtil.inputStream2String(is);
+            }else {
+                //请求失败
+                return null;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     private void initEvent() {
         viewPager.setAdapter(adapter);
         viewPager.addOnPageChangeListener(new GuidePageChangeListener());
@@ -43,13 +189,15 @@ public class MainActivity extends AppCompatActivity {
          52          */
         LayoutInflater inflater = LayoutInflater.from(this);
         View page1 = inflater.inflate(R.layout.imageappr, null);
+        View page2 = inflater.inflate(R.layout.imageappr, null);
+        View page3 = inflater.inflate(R.layout.imageappr, null);
 
         //添加到集合中
         viewPages.add(page1);
 
-        viewPages.add(page1);
+        viewPages.add(page2);
 
-        viewPages.add(page1);
+        viewPages.add(page3);
         adapter = new PagerAdapter() {
             //获取当前界面个数
             //
