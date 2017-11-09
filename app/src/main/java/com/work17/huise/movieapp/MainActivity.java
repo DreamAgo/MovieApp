@@ -1,130 +1,185 @@
 package com.work17.huise.movieapp;
 
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.PopupMenu;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.Switch;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
-    private ViewPager viewPager;
-    private PagerAdapter adapter;
-    private List<View> viewPages = new ArrayList<>();
-    //包裹点点的LinearLayout
-    private ViewGroup group;
-    private ImageView imageView;
-     //定义一个ImageVIew数组，来存放生成的小园点
-     private ImageView[] imageViews;
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+private LinearLayout mLin_hot;
+ private LinearLayout mLin_new;
+private LinearLayout mLin_search;
+private ImageButton mImg_hot;
+ private ImageButton mImg_new;
+private ImageButton mImg_search;
+    private ImageButton mImg_menu;
+    private TextView mTex_hot;
+    private TextView mTex_new;
+    private TextView mTex_search;
+    private Fragment mHotfragment;
+    private Fragment mNewfragment;
+    private Fragment mSearchfragment;
+
+
+
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId())
+        {
+            case R.id.lin_hot:
+               Clickchange(mImg_hot,mTex_hot);
+        StandChange(mImg_new,mTex_new,mImg_search,mTex_search);
+                InitFragment(0);
+                break;
+            case  R.id.lin_new:
+                Clickchange(mImg_new,mTex_new);
+                StandChange(mImg_hot,mTex_hot,mImg_search,mTex_search);
+                InitFragment(1);
+                break;
+            case  R.id.lin_search:
+                Clickchange(mImg_search,mTex_search);
+                StandChange(mImg_hot,mTex_hot,mImg_new,mTex_new);
+                InitFragment(2);
+                break;
+            case R.id.Img_menu:
+                ShowPopMenu(mImg_menu);
+                break;
+
+
+
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        initView();
-        initPageAdapter();
-        initPointer();
-        initEvent();
+        //初始化view
+        InitView();
+        //初始化导航栏颜色
+        Clickchange(mImg_hot,mTex_hot);
+        //设置默认的fragment
+        InitFragment(0);
 
     }
-    private void initEvent() {
-        viewPager.setAdapter(adapter);
-        viewPager.addOnPageChangeListener(new GuidePageChangeListener());
+    //初始化数据
+    public void InitView()
+    {
+        mLin_hot=(LinearLayout)findViewById(R.id.lin_hot);
+        mLin_hot.setOnClickListener(this);
+        mLin_new=(LinearLayout)findViewById(R.id.lin_new);
+        mLin_new.setOnClickListener(this);
+        mLin_search=(LinearLayout)findViewById(R.id.lin_search);
+        mLin_search.setOnClickListener(this);
+        mImg_hot=(ImageButton)findViewById(R.id.img_hot);
+        mImg_new=(ImageButton)findViewById(R.id.img_new);
+        mImg_search=(ImageButton)findViewById(R.id.img_search);
+        mTex_hot=(TextView)findViewById(R.id.text_hot);
+        mTex_new=(TextView)findViewById(R.id.text_new);
+        mTex_search=(TextView)findViewById(R.id.text_search);
+        mImg_menu=(ImageButton)findViewById(R.id.Img_menu);
+        mImg_menu.setOnClickListener(this);
+
     }
-
-    private void initPageAdapter() {
-        /**
-         51          * 对于这几个想要动态载入的page页面，使用LayoutInflater.inflate()来找到其布局文件，并实例化为View对象
-         52          */
-        LayoutInflater inflater = LayoutInflater.from(this);
-        View page1 = inflater.inflate(R.layout.imageappr, null);
-
-        //添加到集合中
-        viewPages.add(page1);
-
-        viewPages.add(page1);
-
-        viewPages.add(page1);
-        adapter = new PagerAdapter() {
-            //获取当前界面个数
-            //
-          @Override
-            public int getCount() {
-              return viewPages.size();
-          }
-            //判断是否由对象生成页面
-            @Override
-            public boolean isViewFromObject(View view, Object object) {
-                return view == object;
-            }
-            @Override
-              public void destroyItem(ViewGroup container, int position, Object object) {
-                container.removeView(viewPages.get(position));
-            }
-            //返回一个对象，这个对象表明了PagerAdapter适配器选择哪个对象放在当前的ViewPager中
-            @Override
-            public Object instantiateItem(ViewGroup container, int position) {
-                View view = viewPages.get(position);
-                container.addView(view);
-                return view;
-            }
-        };
+    public  void Clickchange(ImageButton img,TextView textView)
+    {
+        img.setImageResource(R.drawable.green);
+        textView.setTextColor(getResources().getColor(R.color.green));
     }
-    private void initView() {
-        viewPager = (ViewPager) findViewById(R.id.viewPager);
-        group = (ViewGroup) findViewById(R.id.viewGroup);
-    }
-    //初始化下面的小圆点的方法
-    private void initPointer() {
-        //有多少个界面就new多长的数组
-        imageViews = new ImageView[viewPages.size()];
-        for (int i = 0; i < imageViews.length; i++) {
-            imageView = new ImageView(this);
-            //设置控件的宽高
-            imageView.setLayoutParams(new ViewGroup.LayoutParams(40, 40));
-            //控件的padding属性
-            imageView.setPadding(20, 0, 20, 0);
-            imageViews[i] = imageView;
-            //初始化第一个page页面的图片的原点为选中状态
-            if (i == 0) {
-                //表示当前图片
-                imageViews[i].setBackgroundResource(R.drawable.in);/**
-                                 * 在java代码中动态生成ImageView的时候
-                                  * 要设置其BackgroundResource属性才有效
-                                  * 设置ImageResource属性无效
-                                 */
+    public void StandChange(ImageButton img,TextView textView,ImageButton img1,TextView textView1)
+    {
+        img.setImageResource(R.drawable.red);
+        textView.setTextColor(getResources().getColor(R.color.hui));
+        img1.setImageResource(R.drawable.red);
+        textView1.setTextColor(getResources().getColor(R.color.hui));
 
-            } else {
-                imageViews[i].setBackgroundResource(R.drawable.un);
-            }
-            group.addView(imageViews[i]);
-        }
     }
-    //ViewPager的onPageChangeListener监听事件，当ViewPager的page页发生变化的时候调用
-    public class GuidePageChangeListener implements ViewPager.OnPageChangeListener {
-        @Override
-        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-        }
-        //页面滑动完成后执行
-        @Override
-        public void onPageSelected(int position) {
-                        //判断当前是在那个page，就把对应下标的ImageView原点设置为选中状态的图片
-            for (int i = 0; i < imageViews.length; i++) {
-                imageViews[position].setBackgroundResource(R.drawable.in);
-                if (position != i) {
-                    imageViews[i].setBackgroundResource(R.drawable.un);
+    //设置frgment
+    public void InitFragment(int index)
+    {
+        FragmentManager fm=getSupportFragmentManager();
+        FragmentTransaction tr=fm.beginTransaction();
+        HideFragment(tr);
+        switch (index)
+        {
+            case 0:
+                if (mHotfragment==null)
+                {
+                    mHotfragment=new HotFragement();
+                    tr.add(R.id.frg_content,mHotfragment);
                 }
-            }
-        }
-        //监听页面的状态，0--静止  1--滑动   2--滑动完成
-        @Override
-        public void onPageScrollStateChanged(int state) {
-        }
-    }
+                else {
+                    tr.show(mHotfragment);
+                }
+                break;
+            case 1:
+                if (mNewfragment==null)
+                {
+                    mNewfragment=new NewFragment();
+                    tr.add(R.id.frg_content,mNewfragment);
+                }
+                else {
+                    tr.show(mNewfragment);
+                }
+                break;
+            case 2:
+                if (mSearchfragment==null)
+                {
+                    mSearchfragment=new Search_Fragment();
+                    tr.add(R.id.frg_content,mSearchfragment);
 
+                }
+                else {
+                    tr.show(mSearchfragment);
+                }
+                break;
+
+
+        }
+        tr.commit();
+    }
+    //隐藏fragment
+    public void HideFragment(FragmentTransaction tr)
+    {
+        if (mHotfragment!=null)
+        {
+           // mHotfragment=new HotFragement();
+            tr.hide(mHotfragment);
+        }
+
+        if (mNewfragment!=null)
+        {
+            //mNewfragment=new HotFragement();
+            tr.hide(mNewfragment);
+        }
+        if (mSearchfragment!=null)
+        {
+           // mSearchfragment=new HotFragement();
+            tr.hide(mSearchfragment);
+        }
+
+    }
+    public void ShowPopMenu(View v)
+    {
+        PopupMenu popupMenu=new PopupMenu(this,v);
+        popupMenu.getMenuInflater().inflate(R.menu.main,popupMenu.getMenu());
+        popupMenu.show();
+    }
 }
+
