@@ -148,7 +148,7 @@ public class ImageLoader {
             }
             if(bitmap != null){
                 //根据url去获取 对应的imageView对象，防止显示混乱
-                ImageView imageView = (ImageView) mListView.findViewWithTag(url);
+                ImageView imageView = mimageView;
                 imageView.setImageBitmap(bitmap);
             }
 
