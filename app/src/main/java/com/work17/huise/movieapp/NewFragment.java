@@ -25,6 +25,7 @@ public class NewFragment extends Fragment {
     }
 
     private void initView() {
+
         listView=(ListViewForScrollView)view.findViewById(R.id.list);
     }
     private void initList() {
