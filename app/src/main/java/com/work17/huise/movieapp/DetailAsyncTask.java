@@ -1,17 +1,9 @@
 package com.work17.huise.movieapp;
 
-/**
- * Created by Administrator on 2017/11/12/012.
- */
-
 import android.content.Context;
-import android.content.Intent;
 import android.os.AsyncTask;
-import android.os.Build;
-import android.support.annotation.RequiresApi;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.alibaba.fastjson.JSON;
 
@@ -21,40 +13,47 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.List;
 
+/**
+ * Created by Administrator on 2017/11/13 0013.
+ */
 
-public class NewsAsyncTask extends AsyncTask<String , Void, MoveData> {
-    private Context context;
-    private ListView listView;
-    public NewsAsyncTask(Context context,ListView listView)
+public class DetailAsyncTask extends AsyncTask<String,Void,MoveData> {
+    private String doubanuri="/v2/movie/subject/:";
+    private ImageView mImg_big;
+    private TextView mTex_name;
+    private TextView  mTex_director;
+    private TextView  mTex_year;
+    private TextView  mTex_actor;
+    private ImageView mImg_1;
+    private ImageView mImg_2;
+    private ImageView mImg_3;
+    private ImageView mImg_4;
+    private TextView mText_remark;
+    public DetailAsyncTask(ImageView big, TextView moviename,TextView director,TextView year,TextView actor,ImageView mImg_1,ImageView mImg_2,ImageView mImg_3,ImageView mImg_4,TextView remark)
     {
-        this.context=context;
-        this.listView=listView;
+        this.mImg_1=mImg_1;
+        this.mImg_2=mImg_2;
+        this.mImg_3=mImg_3;
+        this.mImg_4=mImg_4;
+        this.mTex_name=moviename;
+        this.mTex_director=director;
+        this.mTex_year=year;
+        this.mTex_actor=actor;
+        this.mText_remark=remark;
+
+
 
     }
+    @Override
+    protected void onPostExecute(MoveData moveData) {
+        super.onPostExecute(moveData);
+
+    }
+
     @Override
     protected MoveData doInBackground(String... params) {
-        return getdata(params[0]);
-    }
-    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
-    @Override
-    protected void onPostExecute(final MoveData result) {
-        super.onPostExecute(result);
-        //创建并给listView设置适配器
-        final NewsAdapter adapter = new NewsAdapter(context, result,listView);
-        listView.setAdapter(adapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                adapter.Onclick(position);
-
-
-
-
-            }
-
-        });
+      return getdata(doubanuri+params[0]);
     }
     private static String loginByGet(String path){
         //get的方式提交就是url拼接的方式

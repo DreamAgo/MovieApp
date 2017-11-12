@@ -1,6 +1,7 @@
 package com.work17.huise.movieapp;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
@@ -20,6 +21,7 @@ import java.util.List;
  */
 public class NewsAdapter extends BaseAdapter implements AbsListView.OnScrollListener{
     private MoveData mList;
+    private Context context;
     private LayoutInflater mInflater;
     //图片加载类
     private ImageLoader imageLoader;
@@ -32,6 +34,7 @@ public class NewsAdapter extends BaseAdapter implements AbsListView.OnScrollList
     public NewsAdapter(Context context,MoveData mList, ListView listView){
         mInflater = LayoutInflater.from(context);
         this.mList = mList;
+        this.context=context;
         imageLoader = new ImageLoader(listView,context);
         //获取所有的URL并初始化数组
         URLS = new String[mList.getSubjects().size()];
@@ -58,7 +61,12 @@ public class NewsAdapter extends BaseAdapter implements AbsListView.OnScrollList
 
     public void Onclick(int Postion)
     {
-        Log.d("ddd",Postion+"");
+        Intent intent=new Intent(context,DeTailActivity.class);
+    intent.putExtra("id",mList.getSubjects().get(Postion).getId()) ;
+        context.startActivity(intent);
+
+
+
 
 
     }
