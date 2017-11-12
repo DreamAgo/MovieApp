@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
+    android:descendantFocusability="beforeDescendants"
     android:layout_height="match_parent">
 
     <LinearLayout
@@ -10,41 +11,47 @@
         android:orientation="horizontal">
 
         <ImageView
+            android:id="@+id/image"
             android:layout_width="90dp"
-            android:src="@drawable/w"
-            android:layout_height="126dp" />
+            android:layout_height="126dp"
+            android:src="@drawable/w" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
 
             android:orientation="vertical">
+
             <TextView
-                android:layout_width="wrap_content"
                 android:id="@+id/title"
-                android:layout_marginLeft="30dp"
-                android:text="电影名：东方快车谋杀案"
-                android:layout_height="wrap_content" />
-            <TextView
                 android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="30dp"
+                android:text="电影名：东方快车谋杀案" />
+
+            <TextView
                 android:id="@+id/directors"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_marginLeft="30dp"
                 android:layout_marginTop="8dp"
-                android:text="导演：肯尼思·布拉纳"
-                android:layout_height="wrap_content" />
+                android:text="导演：无" />
+
             <TextView
-                android:layout_width="wrap_content"
                 android:id="@+id/year"
-                android:layout_marginLeft="30dp"
-                android:layout_marginTop="8dp"
-                android:text="年份：2017"
-                android:layout_height="wrap_content" />
-            <TextView
                 android:layout_width="wrap_content"
-                android:id="@+id/casts"
+                android:layout_height="wrap_content"
                 android:layout_marginLeft="30dp"
                 android:layout_marginTop="8dp"
-                android:text="主演：约翰尼·"
-                android:layout_height="wrap_content" />
+                android:text="年份：2017" />
+
+            <TextView
+                android:id="@+id/casts"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="30dp"
+                android:layout_marginTop="8dp"
+                android:text="主演：约翰尼·" />
 
         </LinearLayout>
     </LinearLayout>

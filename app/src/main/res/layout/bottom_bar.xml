@@ -16,6 +16,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:clickable="false"
+            android:background="#00000000"
             android:src="@drawable/red"
             />
         <TextView
@@ -39,6 +40,7 @@
             android:layout_height="wrap_content"
             android:clickable="false"
             android:src="@drawable/red"
+            android:background="#00000000"
             />
 
         <TextView
@@ -62,6 +64,7 @@
             android:layout_height="wrap_content"
             android:clickable="false"
             android:src="@drawable/red"
+            android:background="#00000000"
             />
 
         <TextView
