@@ -7,6 +7,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -27,6 +28,7 @@ public class DeTailActivity extends AppCompatActivity implements  View.OnClickLi
     private ImageView mImg_4;
     private TextView mText_remark;
  public DetailAsyncTask asyncTask;
+    private  ImageView[] imageViews;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +37,8 @@ public class DeTailActivity extends AppCompatActivity implements  View.OnClickLi
         InitView();
         Intent intent=this.getIntent();
  String id =intent.getStringExtra("id");
-     asyncTask=new DetailAsyncTask(mImg_big,mTex_name,mTex_director,mTex_year,mTex_actor,mImg_1,mImg_2,mImg_3,mImg_4,mText_remark);
+        Log.e("Id",id);
+     asyncTask=new DetailAsyncTask(this,mImg_big,mTex_name,mTex_director,mTex_year,mTex_actor,imageViews,mText_remark);
         asyncTask.execute(id);
 
 
@@ -73,6 +76,7 @@ public class DeTailActivity extends AppCompatActivity implements  View.OnClickLi
         mTex_actor=(TextView)findViewById(R.id.actor);
         mTex_director=(TextView)findViewById(R.id.director_name);
         mText_remark=(TextView)findViewById(R.id.remark);
+        imageViews=new ImageView[]{mImg_1,mImg_2,mImg_3,mImg_4};
     }
     public void ShowPopMenu(View v)
     {

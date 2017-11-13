@@ -1,0 +1,57 @@
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="150dp"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            style="@style/menu"
+
+            android:text="推荐" />
+        <TextView
+            style="@style/menu"
+
+            android:text="热点" />
+        <TextView
+            android:id="@+id/textView"
+            style="@style/menu"
+
+            android:text="电视剧" />
+
+        <TextView
+            style="@style/menu"
+
+            android:text="电影" />
+
+
+        <TextView
+            style="@style/menu"
+
+            android:text="动漫" />
+
+        <TextView
+            style="@style/menu"
+
+            android:text="少儿" />
+
+        <TextView
+            style="@style/menu"
+
+            android:text="娱乐" />
+
+        <TextView
+            style="@style/menu"
+
+            android:text="卡通" />
+
+    </LinearLayout>
+
+</ScrollView>
+
+

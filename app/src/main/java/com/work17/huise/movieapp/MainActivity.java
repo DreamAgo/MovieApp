@@ -69,7 +69,7 @@ private ImageButton mImg_search;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.main);
         //初始化view
         InitView();
         //初始化导航栏颜色

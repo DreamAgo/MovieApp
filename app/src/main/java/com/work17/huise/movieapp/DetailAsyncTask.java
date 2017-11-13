@@ -2,6 +2,8 @@ package com.work17.huise.movieapp;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -18,8 +20,8 @@ import java.net.URL;
  * Created by Administrator on 2017/11/13 0013.
  */
 
-public class DetailAsyncTask extends AsyncTask<String,Void,MoveData> {
-    private String doubanuri="/v2/movie/subject/:";
+public class DetailAsyncTask extends AsyncTask<String,Void,DetailedMove> {
+    private String doubanuri="https://api.douban.com/v2/movie/subject/";
     private ImageView mImg_big;
     private TextView mTex_name;
     private TextView  mTex_director;
@@ -30,31 +32,74 @@ public class DetailAsyncTask extends AsyncTask<String,Void,MoveData> {
     private ImageView mImg_3;
     private ImageView mImg_4;
     private TextView mText_remark;
-    public DetailAsyncTask(ImageView big, TextView moviename,TextView director,TextView year,TextView actor,ImageView mImg_1,ImageView mImg_2,ImageView mImg_3,ImageView mImg_4,TextView remark)
+    private  Context context;
+    private  ImageView[] imgs;
+    public DetailAsyncTask(Context con,ImageView big, TextView moviename,TextView director,TextView year,TextView actor,ImageView[] imgs,TextView remark)
     {
-        this.mImg_1=mImg_1;
-        this.mImg_2=mImg_2;
-        this.mImg_3=mImg_3;
-        this.mImg_4=mImg_4;
+        this.mImg_big=big;
+        this.context=con;
         this.mTex_name=moviename;
         this.mTex_director=director;
         this.mTex_year=year;
         this.mTex_actor=actor;
         this.mText_remark=remark;
+        this.imgs=imgs;
 
 
 
     }
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     @Override
-    protected void onPostExecute(MoveData moveData) {
+    protected void onPostExecute(DetailedMove moveData) {
         super.onPostExecute(moveData);
 
-    }
+if (moveData==null)
+{
+    return;
+}
+        ImageLoader loader = new ImageLoader(mImg_big, context);
+        loader.loadImages(moveData.getImages().getLarge());
+if (moveData.getDirectors().size()>0)
+        {
+            mTex_director.setText("导演："+moveData.getDirectors().get(0).getName().toString());
+        }
+        else {
+            mTex_director.setText("导演："+"无");
+        }
+        if (moveData.getCasts().size()>0)
+        {  String actor="主演：";
+            for (int i=0;i<moveData.getCasts().size();i++)
+            {
 
+                actor+=moveData.getCasts().get(i).getName().toString()+"/";
+            }
+            mTex_actor.setText(actor);
+        }
+        if (moveData.getCasts().size()>0)
+        {
+            for (int i=0;i<moveData.getCasts().size();i++)
+            {
+                 loader = new ImageLoader(imgs[i], context);
+                loader.loadImages(moveData.getCasts().get(i).getAvatars().getMedium());
+            }
+
+        }
+
+        mTex_year.setText("年份:"+moveData.getYear().toString());
+
+        mTex_name.setText("电影名："+moveData.getTitle().toString());
+mText_remark.setText(moveData.getSummary().toString());
+
+
+
+
+    }
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     @Override
-    protected MoveData doInBackground(String... params) {
+    protected DetailedMove doInBackground(String... params) {
       return getdata(doubanuri+params[0]);
     }
+
     private static String loginByGet(String path){
         //get的方式提交就是url拼接的方式
 
@@ -87,9 +132,10 @@ public class DetailAsyncTask extends AsyncTask<String,Void,MoveData> {
         }
         return null;
     }
-    private MoveData getdata(String url)
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
+    private DetailedMove getdata(String url)
     {
         String js = loginByGet(url);
-        return JSON.parseObject(js, MoveData.class);
+        return JSON.parseObject(js, DetailedMove.class);
     }
 }
